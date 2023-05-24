@@ -34,7 +34,7 @@ class LDiagram(WickContractions.corrs.diagram.Diagram):
                     args.append(p.xf)
                     args.append(p.tf)
                 if i==0: 
-                    self.commuting.append(IndexedFunction('V*',[color_idx, idx],args))
+                    self.commuting.append(IndexedFunction('V^*',[color_idx, idx],args))
                 else:
                     self.commuting.append(IndexedFunction('V',[color_idx, idx], args))
 
@@ -98,7 +98,7 @@ class LDiagram(WickContractions.corrs.diagram.Diagram):
             if len(otherNames)>1:
                 print("T has different kinds of V's in it...")
                 Tblock.name+='^?'
-            elif otherNames[0]=='V*':
+            elif otherNames[0]=='V^*':
                 Tblock.name+='^*'
             
             self.Tblocks[str(Tblock)]=rhsString
