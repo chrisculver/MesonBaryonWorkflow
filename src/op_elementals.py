@@ -6,7 +6,8 @@ from WickContractions.ops.commuting import *
 cIdx = lambda c : 'c_{' + str(c) + '}'
 sIdx = lambda s : 's_{' + str(s) + '}'
 epsilonTensor = lambda c0 : EpsilonTensor([cIdx(c0), cIdx(c0+1), cIdx(c0+2)])
-spinTensor = lambda name, s0: SpinMatrix(name, [sIdx(s0), sIdx(s0+1)])
+gammaMatrix = lambda name, s0: SpinMatrix(name, [sIdx(s0), sIdx(s0+1)])
+baryonSpinTensor = lambda name, s0: SpinMatrix(name, [sIdx(s0), sIdx(s0+1), sIdx(s0+2)])
 deltaTensor = lambda c0 : IndexedObject('\\delta', [cIdx(c0), cIdx(c0+1)])
 
 nextSpinIdx = 0
@@ -21,7 +22,7 @@ def quark(anti, f, t, x):
 
 def baryonSource(coef, flavors, x, gammaName):
     eTensor = epsilonTensor(nextColorIdx)
-    sTensor = spinTensor(gammaName, nextSpinIdx)
+    sTensor = baryonSpinTensor(gammaName, nextSpinIdx)
 
     q0 = quark(True, flavors[0], 't_i', x)
     q1 = quark(True, flavors[1], 't_i', x)
@@ -34,7 +35,7 @@ def baryonSource(coef, flavors, x, gammaName):
 
 def baryonSink(coef, flavors, x, gammaName):
     eTensor = epsilonTensor(nextColorIdx)
-    sTensor = spinTensor(gammaName, nextSpinIdx)
+    sTensor = baryonSpinTensor(gammaName, nextSpinIdx)
 
     q0 = quark(False, flavors[0], 't_f', x)
     q1 = quark(False, flavors[1], 't_f', x)
@@ -47,7 +48,7 @@ def baryonSink(coef, flavors, x, gammaName):
 
 def mesonSource(coef, flavor, x, gammaName):
     dTensor = deltaTensor(nextColorIdx)
-    sTensor = spinTensor(gammaName, nextSpinIdx)
+    sTensor = gammaMatrix(gammaName, nextSpinIdx)
 
     q0=quark(True, flavor[0], 't_i', x)
     q1=quark(False, flavor[1], 't_i', x)
@@ -60,7 +61,7 @@ def mesonSource(coef, flavor, x, gammaName):
 
 def mesonSink(coef, flavor, x, gammaName):
     dTensor = deltaTensor(nextColorIdx)
-    sTensor = spinTensor(gammaName, nextSpinIdx)
+    sTensor = gammaMatrix(gammaName, nextSpinIdx)
 
     q0=quark(True, flavor[0], 't_i', x)
     q1=quark(False, flavor[1], 't_i', x)
@@ -73,14 +74,14 @@ def mesonSink(coef, flavor, x, gammaName):
 
 def MesonBaryonSource(coef, baryonData, mesonData):
     eTensor = epsilonTensor(nextColorIdx)
-    sTensorB = spinTensor(baryonData['gamma'], nextSpinIdx)
+    sTensorB = baryonSpinTensor(baryonData['gamma'], nextSpinIdx)
 
     q0 = quark(True, baryonData['flavor'][0], 't_i', baryonData['x'])
     q1 = quark(True, baryonData['flavor'][1], 't_i', baryonData['x'])
     q2 = quark(True, baryonData['flavor'][2], 't_i', baryonData['x'])
 
     dTensor = deltaTensor(nextColorIdx)
-    sTensorM = spinTensor(mesonData['gamma'], nextSpinIdx)
+    sTensorM = gammaMatrix(mesonData['gamma'], nextSpinIdx)
 
     q3=quark(True, mesonData['flavor'][0], 't_i', mesonData['x'])
     q4=quark(False, mesonData['flavor'][1], 't_i', mesonData['x'])
@@ -93,14 +94,14 @@ def MesonBaryonSource(coef, baryonData, mesonData):
 
 def MesonBaryonSink(coef, baryonData, mesonData):
     eTensor = epsilonTensor(nextColorIdx)
-    sTensorB = spinTensor(baryonData['gamma'], nextSpinIdx)
+    sTensorB = baryonSpinTensor(baryonData['gamma'], nextSpinIdx)
 
     q0 = quark(False, baryonData['flavor'][0], 't_i', baryonData['x'])
     q1 = quark(False, baryonData['flavor'][1], 't_i', baryonData['x'])
     q2 = quark(False, baryonData['flavor'][2], 't_i', baryonData['x'])
 
     dTensor = deltaTensor(nextColorIdx)
-    sTensorM = spinTensor(mesonData['gamma'], nextSpinIdx)
+    sTensorM =gammaMatrix(mesonData['gamma'], nextSpinIdx)
 
     q3=quark(True, mesonData['flavor'][0], 't_i', mesonData['x'])
     q4=quark(False, mesonData['flavor'][1], 't_i', mesonData['x'])
