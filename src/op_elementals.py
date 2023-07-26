@@ -96,15 +96,15 @@ def MesonBaryonSink(coef, baryonData, mesonData):
     eTensor = epsilonTensor(nextColorIdx)
     sTensorB = baryonSpinTensor(baryonData['gamma'], nextSpinIdx)
 
-    q0 = quark(False, baryonData['flavor'][0], 't_i', baryonData['x'])
-    q1 = quark(False, baryonData['flavor'][1], 't_i', baryonData['x'])
-    q2 = quark(False, baryonData['flavor'][2], 't_i', baryonData['x'])
+    q0 = quark(False, baryonData['flavor'][0], 't_f', baryonData['x'])
+    q1 = quark(False, baryonData['flavor'][1], 't_f', baryonData['x'])
+    q2 = quark(False, baryonData['flavor'][2], 't_f', baryonData['x'])
 
     dTensor = deltaTensor(nextColorIdx)
     sTensorM =gammaMatrix(mesonData['gamma'], nextSpinIdx)
 
-    q3=quark(True, mesonData['flavor'][0], 't_i', mesonData['x'])
-    q4=quark(False, mesonData['flavor'][1], 't_i', mesonData['x'])
+    q3=quark(True, mesonData['flavor'][0], 't_f', mesonData['x'])
+    q4=quark(False, mesonData['flavor'][1], 't_f', mesonData['x'])
 
 
     return ElementalOperator(coef,
