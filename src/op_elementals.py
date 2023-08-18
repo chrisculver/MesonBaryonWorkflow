@@ -20,7 +20,14 @@ def quark(anti, f, t, x):
     nextColorIdx+=1
     return q
 
-def baryonSource(coef, flavors, x, gammaName):
+def baryonSource(terms, x, g):
+    elementals=[]
+    for flavors,coef in terms.items():
+        fs=[f for f in flavors]
+        elementals.append(baryonSourceElemental(coef, fs, x, g))
+    return Operator(elementals)
+
+def baryonSourceElemental(coef, flavors, x, gammaName):
     eTensor = epsilonTensor(nextColorIdx)
     sTensor = baryonSpinTensor(gammaName, nextSpinIdx)
 
@@ -33,7 +40,15 @@ def baryonSource(coef, flavors, x, gammaName):
         [q0,q1,q2]
     )
 
-def baryonSink(coef, flavors, x, gammaName):
+def baryonSink(terms, x, g):
+    elementals=[]
+    for flavors,coef in terms.items():
+        fs=[f for f in flavors]
+        elementals.append(baryonSinkElemental(coef, fs, x, g))
+    return Operator(elementals)
+
+
+def baryonSinkElemental(coef, flavors, x, gammaName):
     eTensor = epsilonTensor(nextColorIdx)
     sTensor = baryonSpinTensor(gammaName, nextSpinIdx)
 
@@ -46,7 +61,14 @@ def baryonSink(coef, flavors, x, gammaName):
         [q0,q1,q2]
     )
 
-def mesonSource(coef, flavor, x, gammaName):
+def mesonSource(terms, x, g):
+    elementals=[]
+    for flavors,coef in terms.items():
+        fs=[f for f in flavors]
+        elementals.append(mesonSourceElemental(coef, fs, x, g))
+    return Operator(elementals)
+
+def mesonSourceElemental(coef, flavor, x, gammaName):
     dTensor = deltaTensor(nextColorIdx)
     sTensor = gammaMatrix(gammaName, nextSpinIdx)
 
@@ -59,12 +81,19 @@ def mesonSource(coef, flavor, x, gammaName):
         [q0,q1]
     )
 
-def mesonSink(coef, flavor, x, gammaName):
+def mesonSink(terms, x, g):
+    elementals=[]
+    for flavors,coef in terms.items():
+        fs=[f for f in flavors]
+        elementals.append(mesonSinkElemental(coef, fs, x, g))
+    return Operator(elementals)
+
+def mesonSinkElemental(coef, flavor, x, gammaName):
     dTensor = deltaTensor(nextColorIdx)
     sTensor = gammaMatrix(gammaName, nextSpinIdx)
 
-    q0=quark(True, flavor[0], 't_i', x)
-    q1=quark(False, flavor[1], 't_i', x)
+    q0=quark(True, flavor[0], 't_f', x)
+    q1=quark(False, flavor[1], 't_f', x)
 
     return ElementalOperator(
         coef,
@@ -72,19 +101,37 @@ def mesonSink(coef, flavor, x, gammaName):
         [q0,q1]
     )
 
-def MesonBaryonSource(coef, baryonData, mesonData):
+def mesonBaryonSource(mesonData, baryonData):
+    mesonIsospin=mesonData['isospin']
+    xm=mesonData['x']
+    gm=mesonData['g']
+    baryonIsospin=baryonData['isospin']
+    xb=baryonData['x']
+    gb=baryonData['g']
+
+    elementals=[]
+    for mesonFs, mesonC in mesonIsospin.items():
+        for baryonFs, baryonC in baryonIsospin.items():
+            mfs=[f for f in mesonFs]
+            bfs=[f for f in baryonFs]
+            elementals.append(MesonBaryonSourceElemental(mesonC*baryonC, 
+                mfs, bfs, xm, xb, gm, gb
+            ))
+    return Operator(elementals)
+
+def MesonBaryonSourceElemental(coef, mesonFs, baryonFs, xm, xb, gm, gb):
     eTensor = epsilonTensor(nextColorIdx)
-    sTensorB = baryonSpinTensor(baryonData['gamma'], nextSpinIdx)
+    sTensorB = baryonSpinTensor(gb, nextSpinIdx)
 
-    q0 = quark(True, baryonData['flavor'][0], 't_i', baryonData['x'])
-    q1 = quark(True, baryonData['flavor'][1], 't_i', baryonData['x'])
-    q2 = quark(True, baryonData['flavor'][2], 't_i', baryonData['x'])
+    q0 = quark(True, baryonFs[0], 't_i', xb)
+    q1 = quark(True, baryonFs[1], 't_i', xb)
+    q2 = quark(True, baryonFs[2], 't_i', xb)
 
     dTensor = deltaTensor(nextColorIdx)
-    sTensorM = gammaMatrix(mesonData['gamma'], nextSpinIdx)
+    sTensorM = gammaMatrix(gm, nextSpinIdx)
 
-    q3=quark(True, mesonData['flavor'][0], 't_i', mesonData['x'])
-    q4=quark(False, mesonData['flavor'][1], 't_i', mesonData['x'])
+    q3=quark(True, mesonFs[0], 't_i', xm)
+    q4=quark(False, mesonFs[1], 't_i', xm)
 
 
     return ElementalOperator(coef,
@@ -92,19 +139,37 @@ def MesonBaryonSource(coef, baryonData, mesonData):
         [q0,q1,q2,q3,q4]
     )
 
-def MesonBaryonSink(coef, baryonData, mesonData):
-    eTensor = epsilonTensor(nextColorIdx)
-    sTensorB = baryonSpinTensor(baryonData['gamma'], nextSpinIdx)
+def mesonBaryonSink(mesonData, baryonData):
+    mesonIsospin=mesonData['isospin']
+    xm=mesonData['x']
+    gm=mesonData['g']
+    baryonIsospin=baryonData['isospin']
+    xb=baryonData['x']
+    gb=baryonData['g']
 
-    q0 = quark(False, baryonData['flavor'][0], 't_f', baryonData['x'])
-    q1 = quark(False, baryonData['flavor'][1], 't_f', baryonData['x'])
-    q2 = quark(False, baryonData['flavor'][2], 't_f', baryonData['x'])
+    elementals=[]
+    for mesonFs, mesonC in mesonIsospin.items():
+        for baryonFs, baryonC in baryonIsospin.items():
+            mfs=[f for f in mesonFs]
+            bfs=[f for f in baryonFs]
+            elementals.append(MesonBaryonSinkElemental(mesonC*baryonC, 
+                mfs, bfs, xm, xb, gm, gb
+            ))
+    return Operator(elementals)
+
+def MesonBaryonSinkElemental(coef, mesonFs, baryonFs, xm, xb, gm, gb):
+    eTensor = epsilonTensor(nextColorIdx)
+    sTensorB = baryonSpinTensor(gb, nextSpinIdx)
+
+    q0 = quark(False, baryonFs[0], 't_f', xb)
+    q1 = quark(False, baryonFs[1], 't_f', xb)
+    q2 = quark(False, baryonFs[2], 't_f', xb)
 
     dTensor = deltaTensor(nextColorIdx)
-    sTensorM =gammaMatrix(mesonData['gamma'], nextSpinIdx)
+    sTensorM = gammaMatrix(gm, nextSpinIdx)
 
-    q3=quark(True, mesonData['flavor'][0], 't_f', mesonData['x'])
-    q4=quark(False, mesonData['flavor'][1], 't_f', mesonData['x'])
+    q3=quark(True, mesonFs[0], 't_f', xm)
+    q4=quark(False, mesonFs[1], 't_f', xm)
 
 
     return ElementalOperator(coef,
